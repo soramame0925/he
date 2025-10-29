@@ -23,7 +23,7 @@ final class MNO_Post_Manager {
     public static function register_meta_boxes() {
         add_meta_box(
             'mno-post-manager',
-            __( 'Post Manager', 'mno-post-manager' ),
+            __( '投稿管理', 'mno-post-manager' ),
             [ __CLASS__, 'render_meta_box' ],
             'post',
             'normal',
