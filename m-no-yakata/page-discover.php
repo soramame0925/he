@@ -27,6 +27,7 @@ get_header(); ?>
       $count_value = get_field('custom_count_value');
       $chobit     = get_field('chobit_embed');
       $review     = get_field('linked_review');
+      $sheet_id   = $review ? 'reviewSheet-' . get_the_ID() : null;
       $dlsite     = get_field('dlsite_url');
   ?>
       <article class="mno-discover-item">
@@ -100,31 +101,34 @@ get_header(); ?>
           </div>
 
           <div class="mno-meta-right">
-            <?php if ($review) : ?>
-              <button class="mno-btn-review" type="button">詳細を見る</button>
+            <?php if ($review && $sheet_id) : ?>
+              <button class="mno-btn-review" type="button" data-sheet-target="<?php echo esc_attr($sheet_id); ?>">詳細を見る</button>
             <?php endif; ?>
             <?php if ($dlsite) : ?>
               <a href="<?php echo esc_url($dlsite); ?>" target="_blank" rel="noopener" class="mno-btn-dlsite">DLsiteで購入</a>
             <?php endif; ?>
           </div>
         </div>
-		  
-		  		  <!-- ボトムシート -->
-<div class="mno-bottom-sheet" id="reviewSheet">
-  <div class="mno-sheet-overlay"></div>
-  <div class="mno-sheet-content">
-    <button class="mno-sheet-close">&times;</button>
-    <div class="mno-sheet-body">
-      <?php if ($review) :
-        $post = get_post($review);
-        setup_postdata($post);
-        echo apply_filters('the_content', get_the_content());
-        wp_reset_postdata();
-      endif; ?>
-    </div>
-  </div>
-</div>
-		  
+
+        <?php if ($review && $sheet_id) :
+          $review_post = get_post($review);
+        ?>
+          <!-- ボトムシート -->
+          <div class="mno-bottom-sheet" id="<?php echo esc_attr($sheet_id); ?>">
+            <div class="mno-sheet-overlay"></div>
+            <div class="mno-sheet-content">
+              <button class="mno-sheet-close" type="button">&times;</button>
+              <div class="mno-sheet-body">
+                <?php
+                if ($review_post instanceof WP_Post) {
+                  echo apply_filters('the_content', $review_post->post_content);
+                }
+                ?>
+              </div>
+            </div>
+          </div>
+        <?php endif; ?>
+
       </article>
 
 
