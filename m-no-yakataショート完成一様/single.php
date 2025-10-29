@@ -8,16 +8,13 @@
       <article <?php post_class('mno-single'); ?>>
         <h1 class="mno-single__title"><?php the_title(); ?></h1>
 
-        <?php if (has_post_thumbnail()) : ?>
-          <div class="mno-single__thumb">
-            <?php the_post_thumbnail('large'); ?>
-          </div>
-        <?php endif; ?>
-
-        <div class="mno-single__content">
-          <?php the_content(); ?>
-        </div>
-
+        <?php
+        if ( function_exists( 'mno_pm_render_single_template' ) ) {
+          echo mno_pm_render_single_template( get_the_ID() );
+        } else {
+          echo '<div class="mno-single__content">' . apply_filters( 'the_content', get_the_content() ) . '</div>';
+        }
+        ?>
       </article>
 
     <?php endwhile;
