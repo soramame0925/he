@@ -73,7 +73,7 @@ final class MNO_Post_Manager {
         $data['illustrators'] = is_array( $data['illustrators'] ) ? array_map( 'sanitize_text_field', $data['illustrators'] ) : [];
         $data['highlights']   = is_array( $data['highlights'] ) ? array_map( 'sanitize_textarea_field', $data['highlights'] ) : [];
         $data['track_list']   = is_array( $data['track_list'] ) ? array_map( 'sanitize_text_field', $data['track_list'] ) : [];
-        $data['sample_lines'] = is_array( $data['sample_lines'] ) ? array_map( 'sanitize_textarea_field', $data['sample_lines'] ) : [];
+        $data['sample_lines'] = self::normalize_sample_lines( $data['sample_lines'] );
 
         return wp_parse_args( $data, $defaults );
     }
@@ -146,11 +146,29 @@ final class MNO_Post_Manager {
         }
         update_post_meta( $post_id, self::META_PREFIX . 'track_list', $track_list );
 
-        $sample_lines = [];
+        $sample_blocks = [];
         if ( isset( $_POST['mno_pm_sample_lines'] ) && is_array( $_POST['mno_pm_sample_lines'] ) ) {
-            $sample_lines = array_values( array_filter( array_map( 'sanitize_textarea_field', wp_unslash( $_POST['mno_pm_sample_lines'] ) ) ) );
+            foreach ( wp_unslash( $_POST['mno_pm_sample_lines'] ) as $block ) {
+                if ( ! is_array( $block ) ) {
+                    continue;
+                }
+
+                $title = isset( $block['title'] ) ? sanitize_text_field( $block['title'] ) : '';
+                $body  = isset( $block['body'] ) ? sanitize_textarea_field( $block['body'] ) : '';
+                $note  = isset( $block['note'] ) ? sanitize_textarea_field( $block['note'] ) : '';
+
+                if ( '' === $title && '' === $body && '' === $note ) {
+                    continue;
+                }
+
+                $sample_blocks[] = [
+                    'title' => $title,
+                    'body'  => $body,
+                    'note'  => $note,
+                ];
+            }
         }
-        update_post_meta( $post_id, self::META_PREFIX . 'sample_lines', $sample_lines );
+        update_post_meta( $post_id, self::META_PREFIX . 'sample_lines', $sample_blocks );
 
         $sale_price    = get_post_meta( $post_id, self::META_PREFIX . 'sale_price', true );
         $sale_end_date = get_post_meta( $post_id, self::META_PREFIX . 'sale_end_date', true );
@@ -183,6 +201,46 @@ final class MNO_Post_Manager {
 
     private static function sanitize_voice_sample( $value ) {
         return wp_kses( $value, self::get_voice_sample_allowed_tags() );
+    }
+
+    private static function normalize_sample_lines( $value ) {
+        if ( ! is_array( $value ) ) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ( $value as $block ) {
+            if ( is_array( $block ) ) {
+                $title = isset( $block['title'] ) ? sanitize_text_field( $block['title'] ) : '';
+                $body  = isset( $block['body'] ) ? sanitize_textarea_field( $block['body'] ) : '';
+                $note  = isset( $block['note'] ) ? sanitize_textarea_field( $block['note'] ) : '';
+
+                if ( '' === $title && '' === $body && '' === $note ) {
+                    continue;
+                }
+
+                $normalized[] = [
+                    'title' => $title,
+                    'body'  => $body,
+                    'note'  => $note,
+                ];
+            } elseif ( is_string( $block ) ) {
+                $body = sanitize_textarea_field( $block );
+
+                if ( '' === $body ) {
+                    continue;
+                }
+
+                $normalized[] = [
+                    'title' => '',
+                    'body'  => $body,
+                    'note'  => '',
+                ];
+            }
+        }
+
+        return array_values( $normalized );
     }
 
     public static function enqueue_admin_assets( $hook ) {

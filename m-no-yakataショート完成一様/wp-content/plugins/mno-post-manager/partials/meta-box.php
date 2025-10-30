@@ -177,26 +177,69 @@
 
     <section class="mno-pm-meta__section">
         <h3><?php esc_html_e( '一部セリフ抜粋', 'mno-post-manager' ); ?></h3>
-        <div class="mno-pm-repeater mno-pm-repeater--textarea" data-name="mno_pm_sample_lines">
+        <p class="description"><?php esc_html_e( 'セリフブロックを追加して、タイトル・本文・補足を入力してください。', 'mno-post-manager' ); ?></p>
+        <div class="mno-pm-repeater mno-pm-repeater--sample" data-name="mno_pm_sample_lines" data-next-index="<?php echo esc_attr( count( (array) $values['sample_lines'] ) ); ?>">
             <div class="mno-pm-repeater__rows">
                 <?php if ( ! empty( $values['sample_lines'] ) ) : ?>
-                    <?php foreach ( $values['sample_lines'] as $sample_line ) : ?>
-                        <div class="mno-pm-repeater__row">
-                            <span class="dashicons dashicons-move mno-pm-repeater__handle" aria-hidden="true"></span>
-                            <textarea name="mno_pm_sample_lines[]" class="widefat" rows="3"><?php echo esc_textarea( $sample_line ); ?></textarea>
-                            <button type="button" class="button mno-pm-repeater__remove" aria-label="<?php esc_attr_e( '削除', 'mno-post-manager' ); ?>">&minus;</button>
+                    <?php foreach ( $values['sample_lines'] as $index => $sample_block ) :
+                        $title = isset( $sample_block['title'] ) ? $sample_block['title'] : '';
+                        $body  = isset( $sample_block['body'] ) ? $sample_block['body'] : '';
+                        $note  = isset( $sample_block['note'] ) ? $sample_block['note'] : '';
+                        ?>
+                        <div class="mno-pm-repeater__row mno-pm-sample-block">
+                            <div class="mno-pm-sample-block__controls">
+                                <span class="dashicons dashicons-move mno-pm-repeater__handle" aria-hidden="true"></span>
+                                <button type="button" class="button mno-pm-repeater__remove" aria-label="<?php esc_attr_e( '削除', 'mno-post-manager' ); ?>">&minus;</button>
+                            </div>
+                            <div class="mno-pm-sample-block__field">
+                                <label>
+                                    <?php esc_html_e( 'タイトル', 'mno-post-manager' ); ?>
+                                    <input type="text" name="mno_pm_sample_lines[<?php echo esc_attr( $index ); ?>][title]" class="widefat" value="<?php echo esc_attr( $title ); ?>" placeholder="<?php esc_attr_e( '例：トラック1のセリフ', 'mno-post-manager' ); ?>" />
+                                </label>
+                            </div>
+                            <div class="mno-pm-sample-block__field">
+                                <label>
+                                    <?php esc_html_e( 'セリフ本文', 'mno-post-manager' ); ?>
+                                    <textarea name="mno_pm_sample_lines[<?php echo esc_attr( $index ); ?>][body]" class="widefat" rows="4"><?php echo esc_textarea( $body ); ?></textarea>
+                                </label>
+                            </div>
+                            <div class="mno-pm-sample-block__field">
+                                <label>
+                                    <?php esc_html_e( '補足 (任意)', 'mno-post-manager' ); ?>
+                                    <textarea name="mno_pm_sample_lines[<?php echo esc_attr( $index ); ?>][note]" class="widefat" rows="2" placeholder="<?php esc_attr_e( '補足情報があれば入力してください', 'mno-post-manager' ); ?>"><?php echo esc_textarea( $note ); ?></textarea>
+                                </label>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>
             <script type="text/template" class="mno-pm-repeater__template">
-                <div class="mno-pm-repeater__row">
-                    <span class="dashicons dashicons-move mno-pm-repeater__handle" aria-hidden="true"></span>
-                    <textarea name="mno_pm_sample_lines[]" class="widefat" rows="3"></textarea>
-                    <button type="button" class="button mno-pm-repeater__remove" aria-label="<?php esc_attr_e( '削除', 'mno-post-manager' ); ?>">&minus;</button>
+                <div class="mno-pm-repeater__row mno-pm-sample-block">
+                    <div class="mno-pm-sample-block__controls">
+                        <span class="dashicons dashicons-move mno-pm-repeater__handle" aria-hidden="true"></span>
+                        <button type="button" class="button mno-pm-repeater__remove" aria-label="<?php esc_attr_e( '削除', 'mno-post-manager' ); ?>">&minus;</button>
+                    </div>
+                    <div class="mno-pm-sample-block__field">
+                        <label>
+                            <?php esc_html_e( 'タイトル', 'mno-post-manager' ); ?>
+                            <input type="text" name="mno_pm_sample_lines[{{index}}][title]" class="widefat" placeholder="<?php esc_attr_e( '例：トラック1のセリフ', 'mno-post-manager' ); ?>" />
+                        </label>
+                    </div>
+                    <div class="mno-pm-sample-block__field">
+                        <label>
+                            <?php esc_html_e( 'セリフ本文', 'mno-post-manager' ); ?>
+                            <textarea name="mno_pm_sample_lines[{{index}}][body]" class="widefat" rows="4"></textarea>
+                        </label>
+                    </div>
+                    <div class="mno-pm-sample-block__field">
+                        <label>
+                            <?php esc_html_e( '補足 (任意)', 'mno-post-manager' ); ?>
+                            <textarea name="mno_pm_sample_lines[{{index}}][note]" class="widefat" rows="2" placeholder="<?php esc_attr_e( '補足情報があれば入力してください', 'mno-post-manager' ); ?>"></textarea>
+                        </label>
+                    </div>
                 </div>
             </script>
-            <button type="button" class="button mno-pm-repeater__add"><?php esc_html_e( 'セリフを追加', 'mno-post-manager' ); ?></button>
+            <button type="button" class="button mno-pm-repeater__add"><?php esc_html_e( 'セリフブロックを追加', 'mno-post-manager' ); ?></button>
         </div>
     </section>
 
