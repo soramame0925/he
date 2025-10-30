@@ -96,7 +96,7 @@ final class MNO_Post_Manager {
         }
 
         $fields = [
-            'voice_sample'   => 'wp_kses_post',
+            'voice_sample'   => [ __CLASS__, 'sanitize_voice_sample' ],
             'circle_name'    => 'sanitize_text_field',
             'normal_price'   => 'sanitize_text_field',
             'sale_price'     => 'sanitize_text_field',
@@ -161,6 +161,28 @@ final class MNO_Post_Manager {
                 update_post_meta( $post_id, self::META_PREFIX . 'sale_price', '' );
             }
         }
+    }
+
+    public static function get_voice_sample_allowed_tags() {
+        $allowed = wp_kses_allowed_html( 'post' );
+
+        $allowed['iframe'] = [
+            'src'             => true,
+            'width'           => true,
+            'height'          => true,
+            'frameborder'     => true,
+            'allow'           => true,
+            'allowfullscreen' => true,
+            'loading'         => true,
+            'title'           => true,
+            'referrerpolicy'  => true,
+        ];
+
+        return $allowed;
+    }
+
+    private static function sanitize_voice_sample( $value ) {
+        return wp_kses( $value, self::get_voice_sample_allowed_tags() );
     }
 
     public static function enqueue_admin_assets( $hook ) {
