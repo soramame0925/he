@@ -10,7 +10,7 @@ $sale_price     = isset( $data['sale_price'] ) ? $data['sale_price'] : '';
 $sale_end_date  = isset( $data['sale_end_date'] ) ? $data['sale_end_date'] : '';
 $highlights     = ! empty( $data['highlights'] ) ? $data['highlights'] : [];
 $track_list     = ! empty( $data['track_list'] ) ? $data['track_list'] : [];
-$sample_lines   = ! empty( $data['sample_lines'] ) ? $data['sample_lines'] : [];
+$sample_blocks  = ! empty( $data['sample_lines'] ) ? $data['sample_lines'] : [];
 $release_date   = isset( $data['release_date'] ) ? $data['release_date'] : '';
 $genre          = isset( $data['genre'] ) ? $data['genre'] : '';
 $track_duration = isset( $data['track_duration'] ) ? $data['track_duration'] : '';
@@ -141,12 +141,47 @@ if ( $buy_url ) {
 
     <section class="mno-pm-article__section">
         <h2>一部セリフ抜粋</h2>
-        <?php if ( $sample_lines ) : ?>
-            <blockquote class="mno-pm-quote">
-                <?php foreach ( $sample_lines as $line ) : ?>
-                    <p><?php echo nl2br( esc_html( $line ) ); ?></p>
+        <?php if ( $sample_blocks ) : ?>
+            <div class="mno-pm-sample-list">
+                <?php foreach ( $sample_blocks as $block ) :
+                    $title = isset( $block['title'] ) ? $block['title'] : '';
+                    $body  = isset( $block['body'] ) ? $block['body'] : '';
+                    $note  = isset( $block['note'] ) ? $block['note'] : '';
+
+                    $body_lines = array_filter( array_map( 'trim', preg_split( "/\r\n|\r|\n/", $body ) ) );
+                    ?>
+                    <article class="mno-pm-sample">
+                        <header class="mno-pm-sample__header">
+                            <?php if ( $title ) : ?>
+                                <h3 class="mno-pm-sample__title">
+                                    <span class="mno-pm-sample__title-text"><?php echo esc_html( $title ); ?></span>
+                                    <span class="mno-pm-sample__badge"><?php esc_html_e( '※一部セリフ', 'mno-post-manager' ); ?></span>
+                                </h3>
+                                <p class="mno-pm-sample__track"><?php echo esc_html( $title . 'のトラック' ); ?></p>
+                            <?php else : ?>
+                                <h3 class="mno-pm-sample__title">
+                                    <span class="mno-pm-sample__badge"><?php esc_html_e( '※一部セリフ', 'mno-post-manager' ); ?></span>
+                                </h3>
+                            <?php endif; ?>
+                        </header>
+
+                        <?php if ( $body_lines ) : ?>
+                            <div class="mno-pm-sample__body">
+                                <?php foreach ( $body_lines as $line ) : ?>
+                                    <p><?php echo esc_html( $line ); ?></p>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <footer class="mno-pm-sample__footer">
+                            <?php if ( $note ) : ?>
+                                <p class="mno-pm-sample__note"><?php echo esc_html( $note ); ?></p>
+                            <?php endif; ?>
+                            <p class="mno-pm-sample__label"><?php esc_html_e( 'セリフ掲載', 'mno-post-manager' ); ?></p>
+                        </footer>
+                    </article>
                 <?php endforeach; ?>
-            </blockquote>
+            </div>
         <?php else : ?>
             <p>&mdash;</p>
         <?php endif; ?>

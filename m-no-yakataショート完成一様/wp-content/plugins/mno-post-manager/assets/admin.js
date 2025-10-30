@@ -1,11 +1,35 @@
 (function ($) {
   function initRepeater($repeater) {
     var $rows = $repeater.find('.mno-pm-repeater__rows');
-    var template = $repeater.find('.mno-pm-repeater__template').html();
+    var template = $repeater.find('.mno-pm-repeater__template').html() || '';
+    var hasIndexPlaceholder = template.indexOf('{{index}}') !== -1;
+    var nextIndex = parseInt($repeater.attr('data-next-index'), 10);
+
+    if (isNaN(nextIndex)) {
+      nextIndex = $rows.children().length;
+    }
+
+    function getTemplateHtml() {
+      if (!template) {
+        return '';
+      }
+
+      if (!hasIndexPlaceholder) {
+        return template;
+      }
+
+      var html = template.replace(/{{index}}/g, nextIndex);
+      nextIndex += 1;
+      $repeater.attr('data-next-index', nextIndex);
+      return html;
+    }
 
     $repeater.on('click', '.mno-pm-repeater__add', function (event) {
       event.preventDefault();
-      $rows.append(template);
+      var html = getTemplateHtml();
+      if (html) {
+        $rows.append(html);
+      }
     });
 
     $repeater.on('click', '.mno-pm-repeater__remove', function (event) {
