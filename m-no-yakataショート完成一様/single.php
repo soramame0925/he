@@ -6,12 +6,32 @@
     while (have_posts()) : the_post(); ?>
 
       <article <?php post_class('mno-single'); ?>>
-        <h1 class="mno-single__title"><?php the_title(); ?></h1>
-
         <?php
+        $title_markup = '<h1 class="mno-single-title">' . esc_html( get_the_title() ) . '</h1>';
+
         if ( function_exists( 'mno_pm_render_single_template' ) ) {
-          echo mno_pm_render_single_template( get_the_ID() );
+          $single_content = mno_pm_render_single_template( get_the_ID() );
+
+          if ( false !== strpos( $single_content, 'mno-pm-article__gallery' ) ) {
+            $original_content = $single_content;
+
+            $single_content = preg_replace(
+              '/(<section\s+class="mno-pm-article__section\s+mno-pm-article__gallery"[^>]*>.*?<\/section>)/s',
+              '$1' . $title_markup,
+              $single_content,
+              1
+            );
+
+            if ( null === $single_content ) {
+              $single_content = $title_markup . $original_content;
+            }
+          } else {
+            $single_content = $title_markup . $single_content;
+          }
+
+          echo $single_content;
         } else {
+          echo $title_markup;
           echo '<div class="mno-single__content">' . apply_filters( 'the_content', get_the_content() ) . '</div>';
         }
         ?>
