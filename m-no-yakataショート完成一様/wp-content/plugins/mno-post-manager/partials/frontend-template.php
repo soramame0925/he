@@ -51,7 +51,7 @@ if ( $voice_sample ) {
         }
         $voice_sample_markup = $embed;
     } else {
-        $voice_sample_markup = wp_kses_post( $voice_sample );
+        $voice_sample_markup = wp_kses( $voice_sample, MNO_Post_Manager::get_voice_sample_allowed_tags() );
     }
 }
 
@@ -88,7 +88,9 @@ if ( $buy_url ) {
 
     <?php if ( $voice_sample_markup ) : ?>
         <section class="mno-pm-article__section mno-pm-article__voice">
-            <?php echo $voice_sample_markup; ?>
+            <div class="mno-voice-sample">
+                <?php echo $voice_sample_markup; ?>
+            </div>
         </section>
     <?php endif; ?>
 

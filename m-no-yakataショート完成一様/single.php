@@ -32,6 +32,27 @@
           echo $single_content;
         } else {
           echo $title_markup;
+          $voice_sample_value = get_post_meta( get_the_ID(), '_mpm_voice_sample', true );
+          if ( $voice_sample_value ) {
+            $allowed_tags = wp_kses_allowed_html( 'post' );
+            $allowed_tags['iframe'] = [
+              'src'             => true,
+              'width'           => true,
+              'height'          => true,
+              'frameborder'     => true,
+              'allow'           => true,
+              'allowfullscreen' => true,
+              'loading'         => true,
+              'title'           => true,
+              'referrerpolicy'  => true,
+            ];
+
+            $voice_sample_html = wp_kses( $voice_sample_value, $allowed_tags );
+
+            if ( $voice_sample_html ) {
+              echo '<div class="mno-voice-sample">' . $voice_sample_html . '</div>';
+            }
+          }
           echo '<div class="mno-single__content">' . apply_filters( 'the_content', get_the_content() ) . '</div>';
         }
         ?>
